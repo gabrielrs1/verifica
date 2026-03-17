@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verifica - Combate às Fake News</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Toast de notificação -->
+    <div id="toast-container"></div>
+
+    <!-- Cabeçalho -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-icon">&#128270;</span>
+          <span class="logo-text">Verifica</span>
+        </div>
+        <p class="header-slogan">Cheque antes de compartilhar.</p>
+      </div>
+    </header>
+
+    <!-- Conteúdo principal -->
+    <main class="main">
+      <section class="intro">
+        <h1>Aprenda a identificar Fake News</h1>
+        <p>
+          Explore artigos, dicas e casos reais para se tornar um leitor crítico
+          e consciente na internet.
+        </p>
+      </section>
+
+      <!-- Lista de módulos -->
+      <section id="lista-modulos">
+        <div id="modulos-grid" class="cards-grid">
+          <div class="loading">Carregando módulos...</div>
+        </div>
+      </section>
+
+      <!-- Detalhe do módulo (oculto por padrão) -->
+      <section id="detalhe-modulo" style="display: none">
+        <div class="modulo-detalhe-card">
+          <button id="btn-voltar" class="btn btn-voltar">
+            &#8592; Voltar
+          </button>
+          <div class="modulo-detalhe-header">
+            <h1 id="detalhe-titulo"></h1>
+            <div class="modulo-detalhe-meta">
+              <span id="detalhe-badge"></span>
+              <span class="nivel" id="detalhe-nivel"></span>
+            </div>
+          </div>
+          <div class="modulo-detalhe-corpo">
+            <p id="detalhe-descricao"></p>
+          </div>
+          <div class="modulo-detalhe-footer">
+            <span id="detalhe-data" class="detalhe-data"></span>
+            <div class="card-actions">
+              <button id="btn-pdf" class="btn btn-pdf">
+                &#128196; Baixar PDF
+              </button>
+              <button id="btn-share" class="btn btn-share">
+                &#128279; Compartilhar
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <p>
+          <strong>Verifica</strong> &mdash; Projeto educacional para o combate à
+          desinformação entre jovens.
+        </p>
+        <p class="footer-links">
+          <a href="admin.html">Painel Admin</a>
+        </p>
+      </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
