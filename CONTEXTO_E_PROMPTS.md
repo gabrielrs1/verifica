@@ -2,7 +2,7 @@
 
 ---
 
-## 🔑 MENSAGEM 1: CONTEXTO MESTRE
+## 🔑 MENSAGEM 1: CONTEXTO PRINCIPAL
 
 ```
 Atue como um Engenheiro de Software Full Stack sênior. Vamos desenvolver um aplicativo web chamado Verifica. O objetivo do projeto é promover o combate à disseminação de fake news entre jovens e adolescentes, ensinando-os sobre prevenção em conteúdos encontrados na internet.
