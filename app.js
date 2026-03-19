@@ -3,7 +3,6 @@ const API_BASE = "http://localhost:3000/api";
 // =============================================
 // TOAST NOTIFICATIONS
 // =============================================
-
 function showToast(mensagem, tipo = "sucesso") {
   const container = document.getElementById("toast-container");
   const toast = document.createElement("div");
@@ -20,7 +19,6 @@ function showToast(mensagem, tipo = "sucesso") {
 // =============================================
 // FORMATAR DATA
 // =============================================
-
 function formatarData(dataStr) {
   if (!dataStr) return "";
   const data = new Date(dataStr);
@@ -34,7 +32,6 @@ function formatarData(dataStr) {
 // =============================================
 // RENDERIZAR ESTRELAS
 // =============================================
-
 function renderizarEstrelas(nivel) {
   let html = "";
   for (let i = 1; i <= 3; i++) {
@@ -46,7 +43,6 @@ function renderizarEstrelas(nivel) {
 // =============================================
 // BADGE DE TIPO
 // =============================================
-
 const tipoLabels = {
   artigo: "Artigo",
   dica: "Dica",
@@ -61,7 +57,6 @@ function renderizarBadge(tipo) {
 // =============================================
 // DOWNLOAD PDF
 // =============================================
-
 async function baixarPDF(id) {
   try {
     const resp = await fetch(`${API_BASE}/conteudos/${id}`);
@@ -171,7 +166,6 @@ async function baixarPDF(id) {
 // =============================================
 // COMPARTILHAR
 // =============================================
-
 async function compartilhar(conteudo) {
   const dados = {
     title: "Conteúdo do Verifica",
@@ -200,7 +194,6 @@ async function compartilhar(conteudo) {
 // =============================================
 // NAVEGAÇÃO: LISTA <-> DETALHE
 // =============================================
-
 const secaoLista = document.getElementById("lista-modulos");
 const secaoDetalhe = document.getElementById("detalhe-modulo");
 
@@ -219,7 +212,6 @@ function mostrarDetalhe() {
 // =============================================
 // ABRIR MÓDULO (detalhe)
 // =============================================
-
 let moduloAtivo = null;
 
 async function abrirModulo(id) {
@@ -253,7 +245,6 @@ async function abrirModulo(id) {
 // =============================================
 // RENDERIZAR CARD DE MÓDULO (clicável)
 // =============================================
-
 function criarCardModulo(modulo) {
   const card = document.createElement("article");
   card.className = "card card-modulo";
@@ -299,7 +290,6 @@ function criarCardModulo(modulo) {
 // =============================================
 // CARREGAR LISTA DE MÓDULOS
 // =============================================
-
 async function carregarModulos() {
   const grid = document.getElementById("modulos-grid");
   grid.innerHTML = '<div class="loading">Carregando módulos...</div>';
@@ -339,9 +329,8 @@ async function carregarModulos() {
 }
 
 // =============================================
-// EVENTOS DOS BOTÕES DO DETALHE
+// EVENTOS BOTÕES DO DETALHE
 // =============================================
-
 document.getElementById("btn-voltar").addEventListener("click", mostrarLista);
 
 document.getElementById("btn-pdf").addEventListener("click", () => {
@@ -355,5 +344,4 @@ document.getElementById("btn-share").addEventListener("click", () => {
 // =============================================
 // INICIALIZAR
 // =============================================
-
 document.addEventListener("DOMContentLoaded", carregarModulos);
