@@ -7,19 +7,16 @@ const app = express();
 const PORT = 3000;
 const DB_PATH = path.join(__dirname, "verifica.db");
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Log de requisições
 app.use((req, res, next) => {
   const agora = new Date().toLocaleString("pt-BR");
   console.log(`[${agora}] ${req.method} ${req.url}`);
   next();
 });
 
-// Inicializar banco de dados
 const db = new sqlite3.Database(DB_PATH, (err) => {
   if (err) {
     console.error("Erro ao conectar ao banco de dados:", err.message);
@@ -28,7 +25,6 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
   console.log("Conectado ao banco de dados SQLite:", DB_PATH);
 });
 
-// Criar tabela
 db.serialize(() => {
   db.run(
     `
