@@ -55,7 +55,7 @@ function renderizarBadge(tipo) {
 }
 
 // =============================================
-// DOWNLOAD PDF
+// DOWNLOAD PDF (usa jsPDF diretamente - sem html2canvas)
 // =============================================
 async function baixarPDF(id) {
   try {
@@ -64,15 +64,74 @@ async function baixarPDF(id) {
     const { sucesso, dados } = await resp.json();
     if (!sucesso || !dados) throw new Error("Dados não encontrados.");
 
-    const conteudo = dados;
-    const nomeArquivo = `verifica_${conteudo.titulo
-      .replace(/\s+/g, "_")
-      .replace(/[^\w]/g, "")
-      .substring(0, 40)}.pdf`;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 20;
+    const maxWidth = pageWidth - margin * 2;
+    let y = margin;
 
     const nivelMap = ["", "Iniciante", "Intermediário", "Avançado"];
-    const nivelTexto = `${nivelMap[conteudo.nivel_dificuldade] || "?"} (${conteudo.nivel_dificuldade}/3)`;
-    const tipoLabel = tipoLabels[conteudo.tipo] || conteudo.tipo;
+    const tipoLabel = tipoLabels[dados.tipo] || dados.tipo;
+
+    // Cabeçalho
+    doc.setFontSize(10);
+    doc.setTextColor(107, 114, 128);
+    doc.text("VERIFICA — Combate às Fake News", pageWidth / 2, y, {
+      align: "center",
+    });
+    y += 10;
+
+    doc.setFontSize(18);
+    doc.setTextColor(29, 78, 216);
+    doc.text(dados.titulo, pageWidth / 2, y, { align: "center", maxWidth });
+    y += 10;
+
+    doc.setFontSize(10);
+    doc.text(tipoLabel.toUpperCase(), pageWidth / 2, y, { align: "center" });
+    y += 12;
+
+    // Linha divisória
+    doc.setDrawColor(37, 99, 235);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    // Informações
+    doc.setTextColor(55, 65, 81);
+    doc.setFontSize(11);
+    const infos = [
+      `Tipo: ${tipoLabel}`,
+      `Dificuldade: ${nivelMap[dados.nivel_dificuldade] || "?"} (${dados.nivel_dificuldade}/3)`,
+      `Criado em: ${formatarData(dados.criado_em)}`,
+      `ID: #${dados.id}`,
+    ];
+    infos.forEach((info) => {
+      doc.text(info, margin, y);
+      y += 6;
+    });
+    y += 8;
+
+    // Conteúdo
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("CONTEÚDO", margin, y);
+    y += 8;
+
+    doc.setFontSize(11);
+    doc.setTextColor(55, 65, 81);
+    const linhas = doc.splitTextToSize(dados.descricao, maxWidth);
+    for (const linha of linhas) {
+      if (y > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.text(linha, margin, y);
+      y += 6;
+    }
+
+    // Rodapé
     const dataGeracao = new Date().toLocaleDateString("pt-BR", {
       day: "2-digit",
       month: "2-digit",
@@ -80,82 +139,14 @@ async function baixarPDF(id) {
       hour: "2-digit",
       minute: "2-digit",
     });
+    doc.setFontSize(9);
+    doc.setTextColor(156, 163, 175);
+    doc.text(`Gerado em ${dataGeracao}`, pageWidth / 2, pageHeight - 10, {
+      align: "center",
+    });
 
-    const linhaAtualizacao =
-      conteudo.atualizado_em && conteudo.atualizado_em !== conteudo.criado_em
-        ? `<tr style="border-bottom: 1px solid #f3f4f6;">
-            <td style="padding: 8px 12px 8px 0; color: #6b7280; font-weight: 600; width: 180px;">Última atualização</td>
-            <td style="padding: 8px 0; color: #111827;">${formatarData(conteudo.atualizado_em)}</td>
-           </tr>`
-        : "";
-
-    const elementoHtml = document.createElement("div");
-    elementoHtml.style.cssText =
-      "font-family: Arial, Helvetica, sans-serif; padding: 32px; color: #111827; max-width: 680px;";
-    elementoHtml.innerHTML = `
-      <div style="border-bottom: 3px solid #2563eb; padding-bottom: 16px; margin-bottom: 24px; text-align: center;">
-        <p style="font-size: 11px; color: #6b7280; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 10px; font-weight: 600;">
-          VERIFICA — Combate às Fake News
-        </p>
-        <h1 style="font-size: 22px; color: #1d4ed8; margin: 0 0 12px; line-height: 1.35; font-weight: 700;">
-          ${conteudo.titulo}
-        </h1>
-        <span style="display: inline-block; background: #dbeafe; color: #1d4ed8; padding: 4px 16px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-          ${tipoLabel}
-        </span>
-      </div>
-
-      <div style="margin-bottom: 24px;">
-        <h2 style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #374151; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 14px;">
-          Informações Gerais
-        </h2>
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-          <tr style="border-bottom: 1px solid #f3f4f6;">
-            <td style="padding: 8px 12px 8px 0; color: #6b7280; font-weight: 600; width: 180px;">Tipo de conteúdo</td>
-            <td style="padding: 8px 0; color: #111827;">${tipoLabel}</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #f3f4f6;">
-            <td style="padding: 8px 12px 8px 0; color: #6b7280; font-weight: 600;">Nível de dificuldade</td>
-            <td style="padding: 8px 0; color: #111827;">${nivelTexto}</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #f3f4f6;">
-            <td style="padding: 8px 12px 8px 0; color: #6b7280; font-weight: 600;">Data de criação</td>
-            <td style="padding: 8px 0; color: #111827;">${formatarData(conteudo.criado_em)}</td>
-          </tr>
-          ${linhaAtualizacao}
-          <tr>
-            <td style="padding: 8px 12px 8px 0; color: #6b7280; font-weight: 600;">Identificador</td>
-            <td style="padding: 8px 0; color: #111827;">#${conteudo.id}</td>
-          </tr>
-        </table>
-      </div>
-
-      <div style="margin-bottom: 28px;">
-        <h2 style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #374151; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 14px;">
-          Descrição Completa
-        </h2>
-        <p style="font-size: 14px; line-height: 1.85; color: #374151; text-align: justify; margin: 0; padding: 14px; background: #f9fafb; border-left: 3px solid #2563eb; border-radius: 0 6px 6px 0;">
-          ${conteudo.descricao}
-        </p>
-      </div>
-
-      <div style="margin-top: 32px; padding-top: 12px; border-top: 2px solid #e5e7eb; text-align: center; font-size: 10px; color: #9ca3af;">
-        <p style="margin: 0 0 3px;">
-          Documento gerado automaticamente pelo sistema <strong style="color: #6b7280;">Verifica</strong>
-        </p>
-        <p style="margin: 0;">Gerado em: ${dataGeracao}</p>
-      </div>
-    `;
-
-    const opcoes = {
-      margin: [15, 15, 15, 15],
-      filename: nomeArquivo,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    };
-
-    await html2pdf().set(opcoes).from(elementoHtml).save();
+    const nomeArquivo = `verifica_${dados.titulo.replace(/\s+/g, "_").replace(/[^\w]/g, "").substring(0, 40)}.pdf`;
+    doc.save(nomeArquivo);
     showToast("PDF baixado com sucesso!", "sucesso");
   } catch (err) {
     console.error("Erro ao gerar PDF:", err);
